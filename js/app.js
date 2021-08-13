@@ -48,7 +48,7 @@ class UserView {
     this.formsValue = {};
   }
 
-  renderList(users) {
+  renderTable(users) {
     this.users = users;
     this.tableBody.innerHTML = "";
     this.users.forEach((user) => {
@@ -61,13 +61,30 @@ class UserView {
     this.sortingTable();
   }
 
+  renderNewTable() {
+    this.tableBody.innerHTML = "";
+    this.users.forEach((user) => {
+      this.tableBody.insertAdjacentHTML("afterbegin", this.template(user));
+    });
+  }
+
   addNewUser() {
     let forms = document.forms["addition-form"];
     let btn = forms.elements[4];
 
     btn.addEventListener("click", (e) => {
       e.preventDefault();
-      this.renderList(this.users);
+      [...forms.elements].forEach((i) => {
+        if (i.value) {
+          this.formsValue = {
+            ...this.formsValue,
+            [i.name]: i.value,
+          };
+        }
+      });
+      this.users = [...this.users, this.formsValue];
+      this.renderTable(this.users);
+      this.formsValue = {};
     });
   }
 
@@ -77,7 +94,7 @@ class UserView {
     [...thead.children].forEach((th) =>
       th.addEventListener("click", () => {
         this.tableBody.innerHTML = "";
-        this.renderList(this.compare(this.users, th.innerText));
+        this.renderTable(this.compare(this.users, th.innerText));
       })
     );
   }
@@ -126,16 +143,16 @@ class UserView {
     });
   }
   rowClickHandler = (row) => {
-    this.user = this.selectedElement && this.users[this.selectedElement - 1];
     this.selectedElement = row.dataset.id;
+    this.user = this.selectedElement && this.users[this.selectedElement - 1];
     this.modal = true;
-    this.renderList(this.users);
+    this.renderTable(this.users);
   };
 
   modalTemplate({ closeBtn }) {
     closeBtn.addEventListener("click", () => {
       this.modal = false;
-      this.renderList(this.users);
+      this.renderTable(this.users);
     });
   }
 
@@ -158,6 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
   async function initApp() {
     await userStore.init();
     let users = await userStore.users;
-    userView.renderList(users);
+    userView.renderTable(users);
   }
 });
