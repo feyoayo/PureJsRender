@@ -1,0 +1,97 @@
+.wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  flex-grow: 1;
+  flex-direction: column;
+  align-items: center;
+}
+table {
+  border-spacing: 0;
+}
+th,
+td {
+  text-align: center;
+  width: 300px;
+  padding: 10px;
+  border: 1px solid grey;
+}
+thead {
+  background: rgb(90, 96, 187) !important;
+  color: white;
+}
+tr:nth-child(even) {
+  background: rgb(75, 102, 110);
+  color: white;
+}
+
+.user-creation {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 300px;
+  padding: 30px;
+  border: 1px solid grey;
+  border-radius: 10px;
+}
+.user-creation div {
+  margin-top: 10px;
+}
+.user-creation span {
+  text-align: center;
+}
+.user-creation .btn-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.user-creation .btn-container button {
+  width: 70px;
+  height: 30px;
+  border: none;
+  background: rgb(49, 40, 128);
+  color: white;
+  border-radius: 5px;
+}
+.user-creation div span {
+  display: inline-block;
+  width: 70px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  transform: translate(0, -50%);
+  width: 50vw;
+  padding: 30px;
+  background-color: wheat;
+  border-radius: 10px;
+  z-index: 11;
+}
+
+.modal-backdrop {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.5;
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+.modal-header button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: bold;
+  background: red;
+  cursor: pointer;
+  /* border: none; */
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+}
