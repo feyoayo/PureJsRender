@@ -45,13 +45,11 @@ class UserView {
       userName: document.getElementById("additional-name"),
       modalTbody: document.getElementById("modal-tbody"),
     };
+    this.formsValue = {};
   }
 
   renderList(users) {
-    let newUsers = this.compare(users, "name", "desc");
-    console.log(newUsers);
-    this.users = newUsers;
-
+    this.users = users;
     this.tableBody.innerHTML = "";
     this.users.forEach((user) => {
       this.tableBody.insertAdjacentHTML("afterbegin", this.template(user));
@@ -59,27 +57,40 @@ class UserView {
     this.makeClickableRow();
     this.openModal(this.modalSelectors);
     this.modalTemplate(this.modalSelectors);
+    this.addNewUser();
+    this.sortingTable();
   }
 
-  compare(arr, criteria, desc) {
+  addNewUser() {
+    let forms = document.forms["addition-form"];
+    let btn = forms.elements[4];
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.renderList(this.users);
+    });
+  }
+
+  sortingTable() {
+    const thead = document.getElementById("main-table-header");
+    // console.log(thead.children);
+    [...thead.children].forEach((th) =>
+      th.addEventListener("click", () => {
+        this.tableBody.innerHTML = "";
+        this.renderList(this.compare(this.users, th.innerText));
+      })
+    );
+  }
+
+  compare(arr, criteria) {
     let newArr = arr.sort((a, b) => {
-      if (!desc) {
-        if (a[criteria] > b[criteria]) {
-          return -1;
-        }
-        if (a[criteria] < b[criteria]) {
-          return 1;
-        }
-        return 0;
-      } else {
-        if (a[criteria] < b[criteria]) {
-          return -1;
-        }
-        if (a[criteria] > b[criteria]) {
-          return 1;
-        }
-        return 0;
+      if (a[criteria.toLowerCase()] > b[criteria.toLowerCase()]) {
+        return -1;
       }
+      if (a[criteria.toLowerCase()] < b[criteria.toLowerCase()]) {
+        return 1;
+      }
+      return 0;
     });
     return newArr;
   }

@@ -10,40 +10,42 @@
   <body>
     <div class="wrapper">
       <section>
-        <h1>List of users</h1>
-        <table>
-          <thead>
-            <th>Name</th>
-            <th>Username</th>
-            <th>email</th>
-            <th>website</th>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </section>
-      <section>
-        <form class="user-creation">
+        <form class="user-creation" id="forms" name="addition-form">
           <span>New user creation</span>
           <div>
             <span>Name* </span>
-            <input type="text" />
+            <input type="text" name="name" />
           </div>
           <div>
             <span>Username</span>
-            <input type="text" />
+            <input type="text" name="username" />
           </div>
           <div>
             <span>email</span>
-            <input type="text" />
+            <input type="text" name="email" />
           </div>
           <div>
             <span>website</span>
-            <input type="text" />
+            <input type="text" name="website" />
           </div>
           <div class="btn-container">
             <button type="submit">Create</button>
           </div>
         </form>
+      </section>
+      <section>
+        <h1>List of users</h1>
+        <table>
+          <thead>
+            <tr id="main-table-header">
+              <th>Name</th>
+              <th>Username</th>
+              <th>email</th>
+              <th>website</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
       </section>
 
       <div class="modal-backdrop" id="modal-backdrop"></div>
