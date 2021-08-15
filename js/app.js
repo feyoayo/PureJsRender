@@ -37,7 +37,6 @@ class UserView {
     this.selectedElement = null;
     this.users = [];
     this.user = {};
-    this.modal = false;
     this.modalSelectors = {
       closeBtn: document.getElementById("close-btn"),
       modalWindow: document.getElementById("modal"),
@@ -45,61 +44,17 @@ class UserView {
       userName: document.getElementById("additional-name"),
       modalTbody: document.getElementById("modal-tbody"),
     };
-    this.formsValue = {};
   }
 
-  renderTable(users) {
-    this.users = users;
+  renderTable() {
     this.tableBody.innerHTML = "";
     this.users.forEach((user) => {
-      this.tableBody.insertAdjacentHTML("afterbegin", this.template(user));
+      this.tableBody.insertAdjacentHTML("afterbegin", this._template(user));
     });
     this.makeClickableRow();
-    this.openModal(this.modalSelectors);
-    this.modalTemplate(this.modalSelectors);
-    this.addNewUser();
-    this.sortingTable();
   }
 
-  renderNewTable() {
-    this.tableBody.innerHTML = "";
-    this.users.forEach((user) => {
-      this.tableBody.insertAdjacentHTML("afterbegin", this.template(user));
-    });
-  }
-
-  addNewUser() {
-    let forms = document.forms["addition-form"];
-    let btn = forms.elements[4];
-
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      [...forms.elements].forEach((i) => {
-        if (i.value) {
-          this.formsValue = {
-            ...this.formsValue,
-            [i.name]: i.value,
-          };
-        }
-      });
-      this.users = [...this.users, this.formsValue];
-      this.renderTable(this.users);
-      this.formsValue = {};
-    });
-  }
-
-  sortingTable() {
-    const thead = document.getElementById("main-table-header");
-    // console.log(thead.children);
-    [...thead.children].forEach((th) =>
-      th.addEventListener("click", () => {
-        this.tableBody.innerHTML = "";
-        this.renderTable(this.compare(this.users, th.innerText));
-      })
-    );
-  }
-
-  compare(arr, criteria) {
+  columnsSorting(arr, criteria) {
     let newArr = arr.sort((a, b) => {
       if (a[criteria.toLowerCase()] > b[criteria.toLowerCase()]) {
         return -1;
@@ -112,51 +67,27 @@ class UserView {
     return newArr;
   }
 
-  openModal({ modalWindow, modalBackdrop }) {
-    if (this.modal) {
-      this.renderModalTemplate(this.user, this.modalSelectors);
-      modalWindow.style.display = "block";
-      modalBackdrop.style.display = "block";
-    } else {
-      modalWindow.style.display = "none";
-      modalBackdrop.style.display = "none";
-    }
-  }
-  renderModalTemplate(user, { modalTbody, userName }) {
-    if (!user) {
-      return;
-    }
-    userName.innerHTML = user.name;
-    modalTbody.innerHTML = `
-            <td>${user.address.street}</td>
-            <td>${user.address.city}</td>
-            <td>${user.address.zipcode}</td>
-            <td>${user.address.suite}</td>
-    `;
-  }
-
   makeClickableRow() {
     [...this.rows].map((row) => {
       row.addEventListener("click", () => {
-        this.rowClickHandler(row);
+        this._rowClickHandler(row);
+        this.renderTable(this.users);
+        this.openModalWindow(this.modalSelectors);
       });
     });
   }
-  rowClickHandler = (row) => {
+
+  _rowClickHandler = (row) => {
     this.selectedElement = row.dataset.id;
-    this.user = this.selectedElement && this.users[this.selectedElement - 1];
-    this.modal = true;
-    this.renderTable(this.users);
+    let user = this.users.filter((user) => {
+      if (this.selectedElement == user.id) {
+        return user;
+      }
+    });
+    this.user = user[0];
   };
 
-  modalTemplate({ closeBtn }) {
-    closeBtn.addEventListener("click", () => {
-      this.modal = false;
-      this.renderTable(this.users);
-    });
-  }
-
-  template(user) {
+  _template(user) {
     return `
         <tr class="userRow" data-id="${user.id}">
             <td data-id="name">${user.name}</td>
@@ -166,15 +97,104 @@ class UserView {
           </tr>
       `;
   }
+
+  openModalWindow({ modalWindow, modalBackdrop }) {
+    this.renderModalTemplate(this.user, this.modalSelectors);
+    modalWindow.style.display = "block";
+    modalBackdrop.style.display = "block";
+  }
+  renderModalTemplate(user, { modalTbody, userName }) {
+    if (!user.name) {
+      return;
+    }
+    userName.innerHTML = user.name;
+    modalTbody.innerHTML = `
+            <td>${user?.address?.street}</td>
+            <td>${user?.address?.city}</td>
+            <td>${user?.address?.zipcode}</td>
+            <td>${user?.address?.suite}</td>
+    `;
+  }
 }
 
 let userView = new UserView();
+
+class FormView extends UserView {
+  constructor() {
+    super(...arguments);
+    this.formsValue = {};
+    this.thead = document.getElementById("main-table-header");
+    this.form = document.forms["addition-form"];
+    this.inputElements = this.form.elements;
+    this.submitBtn = document.getElementById("submit-btn");
+  }
+
+  _cleanForm() {
+    this.formsValue = {};
+    this.inputElements.name.value = "";
+    this.inputElements.username.value = "";
+    this.inputElements.email.value = "";
+    this.inputElements.website.value = "";
+    return;
+  }
+
+  addUser() {
+    this.formsValue = {
+      id: Math.floor(Math.random() * 100),
+      name: this.inputElements.name.value,
+      username: this.inputElements.username.value,
+      email: this.inputElements.email.value,
+      website: this.inputElements.website.value,
+    };
+    this.users = [...userView.users, this.formsValue];
+    super.renderTable();
+    this._cleanForm();
+  }
+}
+const formView = new FormView();
+
+class ModalView extends UserView {
+  constructor() {
+    super(...arguments);
+  }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   initApp();
   async function initApp() {
     await userStore.init();
-    let users = await userStore.users;
-    userView.renderTable(users);
+    userView.users = await userStore.users;
+    userView.renderTable();
   }
+
+  formView.form.addEventListener("click", (e) => {
+    e.preventDefault();
+  });
+  formView.submitBtn.addEventListener("click", (e) => {
+    e.preventDefault;
+    formView.addUser();
+  });
+  [...formView.thead.children].forEach((th) =>
+    th.addEventListener("click", (e) => {
+      userView.users = userView.columnsSorting(userView.users, th.innerText);
+      userView.renderTable();
+    })
+  );
+
+  userView.modalSelectors.closeBtn.addEventListener("click", () => {
+    userView.modalSelectors.modalWindow.style.display = "none";
+    userView.modalSelectors.modalBackdrop.style.display = "none";
+    userView.user = {};
+  });
 });
+
+//helper
+function isEmptyObj(obj) {
+  for (let key in obj) {
+    console.log(key);
+    if (key) {
+      return false;
+    }
+    return true;
+  }
+}

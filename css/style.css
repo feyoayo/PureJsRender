@@ -21,9 +21,18 @@ thead {
   background: rgb(90, 96, 187) !important;
   color: white;
 }
+th {
+  cursor: pointer;
+}
 tr:nth-child(even) {
   background: rgb(75, 102, 110);
   color: white;
+}
+tr:hover {
+  transition: all 0.5s ease;
+  cursor: pointer;
+  background: lightgoldenrodyellow;
+  color: black;
 }
 
 .user-creation {
