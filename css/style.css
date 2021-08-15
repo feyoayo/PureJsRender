@@ -25,14 +25,18 @@ th {
   cursor: pointer;
 }
 tr:nth-child(even) {
-  background: rgb(75, 102, 110);
+  background: rgb(142, 155, 160);
   color: white;
 }
-tr:hover {
+#tbody tr:hover {
   transition: all 0.5s ease;
-  cursor: pointer;
   background: lightgoldenrodyellow;
   color: black;
+}
+.userName {
+  cursor: pointer;
+  color: rgb(71, 71, 231);
+  text-decoration: underline;
 }
 
 .user-creation {

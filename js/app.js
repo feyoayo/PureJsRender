@@ -33,7 +33,7 @@ const userStore = new UserController(api);
 class UserView {
   constructor() {
     this.tableBody = document.getElementById("tbody");
-    this.rows = document.getElementsByClassName("userRow");
+    this.rowsName = document.getElementsByClassName("userName");
     this.selectedElement = null;
     this.users = [];
     this.user = {};
@@ -51,7 +51,9 @@ class UserView {
     this.users.forEach((user) => {
       this.tableBody.insertAdjacentHTML("afterbegin", this._template(user));
     });
-    this.makeClickableRow();
+    this.getUserDetails();
+    this.deleteRowHandler();
+    console.log(this.user);
   }
 
   columnsSorting(arr, criteria) {
@@ -67,12 +69,25 @@ class UserView {
     return newArr;
   }
 
-  makeClickableRow() {
-    [...this.rows].map((row) => {
+  getUserDetails() {
+    [...this.rowsName].map((row) => {
       row.addEventListener("click", () => {
         this._rowClickHandler(row);
-        this.renderTable(this.users);
+        this.renderTable();
         this.openModalWindow(this.modalSelectors);
+      });
+    });
+  }
+
+  deleteRowHandler() {
+    let btns = document.getElementsByClassName("delete-btn");
+    [...btns].forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const row = btn.parentElement.parentElement;
+        this._rowClickHandler(row);
+        let idx = this.users.indexOf(this.user);
+        this.users.splice(idx, 1);
+        this.renderTable();
       });
     });
   }
@@ -90,10 +105,11 @@ class UserView {
   _template(user) {
     return `
         <tr class="userRow" data-id="${user.id}">
-            <td data-id="name">${user.name}</td>
+            <td class="userName" data-id="${user.id}">${user.name}</td>
             <td>${user.username}</td>
             <td>${user.email}</td>
             <td>${user.website}</td>
+            <td><button class="delete-btn">-</button></td>
           </tr>
       `;
   }
